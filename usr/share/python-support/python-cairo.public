@@ -1,0 +1,5 @@
+pyversions=2.6,2.7
+
+/usr/lib/pyshared/python2.6/cairo/_cairo.so
+/usr/lib/pyshared/python2.7/cairo/_cairo.so
+/usr/share/pyshared/cairo/__init__.py

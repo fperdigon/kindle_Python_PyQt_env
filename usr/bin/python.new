@@ -1,0 +1,161 @@
+#!/bin/sh
+
+if [ "$(id -u)" != "0" ]; then 
+    /var/local/mkk/su -s /bin/ash -c "/mnt/us/extensions/python/usr/bin/python 1 > /dev/null 2>&1 &"
+    exit
+elif [ "$1" != "1" ]; then
+    /mnt/us/extensions/python/usr/bin/python 1 > /dev/null 2>&1 &
+    exit
+fi
+
+export ROOT=/mnt/us/extensions/python
+export ROOT_BAK=$ROOT/../vlasovsoft.bak
+QT=$ROOT/lib/Qt
+LOG=/dev/null
+
+cd $ROOT
+
+export LANG=en_US.UTF-8 # for launchpad
+export TMPDIR=/tmp/pyqttmp
+
+export LD_LIBRARY_PATH=$QT/lib
+export LD_LIBRARY_PATH=/mnt/us/extensions/python/usr/lib:/mnt/us/extensions/python/usr/lib/arm-linux-gnueabi:/mnt/us/extensions/python/lib/arm-linux-gnueabi:$LD_LIBRARY_PATH
+
+export PYTHONPATH=/mnt/us/extensions/python/usr/lib/python2.7/
+export QT_PLUGIN_PATH=$QT/plugins
+export QT_QWS_FONTDIR=$ROOT/fonts
+
+export VLASOVSOFT_KEY=$ROOT/tools/key
+export VLASOVSOFT_KBD=$ROOT/tools/kbd.txt
+export VLASOVSOFT_FIFO1=$TMPDIR/fifo1
+export VLASOVSOFT_FIFO2=$TMPDIR/fifo2
+export VLASOVSOFT_I18N=$ROOT/tools/i18n
+export VLASOVSOFT_DICT=$ROOT/tools/dictionary
+
+export STYLESHEET=$ROOT/tools/eink.qss
+
+export UPDATE_DELAY_PART=25
+export UPDATE_DELAY_FULL=50
+export SWIPE_MIN_DISTANCE=10 # mm
+
+serial=`cut -c1-4 /proc/usid`
+
+case "$serial" in
+B002) model="K2"  ;;
+B003) model="K2"  ;;
+B004) model="KDX" ;;
+B005) model="KDX" ;;
+B009) model="KDX" ;;
+B006) model="K3"  ;;
+B008) model="K3"  ;;
+B00A) model="K3"  ;;
+B00E) model="K4"  ;;
+B00F) model="KT"  ;;
+B010) model="KT"  ;;
+B011) model="KT"  ;;
+B012) model="KT"  ;;
+9023) model="K4"  ;;
+B023) model="K4"  ;;
+B01B) model="KPW" ;;
+B01D) model="KPW" ;;
+B024) model="KPW" ;;
+B0D4) model="KPW2" ;;
+90D4) model="KPW2" ;;
+B05A) model="KPW2" ;;
+905A) model="KPW2" ;;
+B0D5) model="KPW2" ;;
+B0D7) model="KPW2" ;;
+B0D8) model="KPW2" ;;
+B0F2) model="KPW2" ;;
+B017) model="KPW2" ;;
+9017) model="KPW2" ;;
+B060) model="KPW2" ;;
+9060) model="KPW2" ;;
+B062) model="KPW2" ;;
+9062) model="KPW2" ;;
+90C6) model="KT2"  ;;
+B0C6) model="KT2"  ;;
+B013) model="KV"   ;;
+B054) model="KV"   ;;
+G090) model="KPW2" ;;
+*) model="KPW2" ;;
+esac
+
+echo $model
+
+if [ $model == "Unknown" ]; then
+    echo "Unknown model: $serial! Exit." > $LOG
+    exit 1;
+fi
+
+export DEVICE=$model
+
+mkdir -p $TMPDIR
+mkfifo $VLASOVSOFT_FIFO1
+mkfifo $VLASOVSOFT_FIFO2
+
+# prevent screensaver activation
+lipc-set-prop com.lab126.powerd preventScreenSaver 1
+
+# upgrade
+if [ -d $ROOT_BAK -a ! -f $ROOT/upgraded ]; then
+    $ROOT/upgrade.sh
+    touch $ROOT/upgraded
+fi
+
+if [ $model == "KT" ] || [ $model == "KT2" ] || [ $model == "KPW" ] || [ $model == "KPW2" ] || [ $model == "KV" ] ; then
+    export QWS_MOUSE_PROTO=KindleTS
+    export QWS_KEYBOARD=none
+    export QWS_DISPLAY=transformed:KindleFb
+
+    # switch to the standard screensaver and disable the ads screensaver (with swipe to unlock)
+    source /etc/upstart/functions
+    source /etc/upstart/blanket_functions
+    f_blanket_unload_module ad_screensaver
+    f_blanket_unload_module ad_screensaver_active
+    f_blanket_load_module screensaver
+
+    # copy scripts to temp folder so that they work when USB is connected and /mnt/us is unmounted
+    cp -f $ROOT/tools/ktsuspend.sh $ROOT/tools/ktresume.sh $ROOT/tools/crfswin $ROOT/tools/usleep /var/tmp/
+
+    /var/tmp/ktsuspend.sh
+
+    lipc-set-prop com.lab126.appmgrd start app://com.lab126.booklet.home
+    cd $PYTHONPATH
+    python2.7 $@ > $LOG 2>&1
+    #$ROOT/app/okular-qte -qws -stylesheet $STYLESHEET > $LOG 2>&1
+    if [ $? -ne 0 ]; then
+        $ROOT/tools/msgbox/msgbox -qws -stylesheet $STYLESHEET "Launcher" "Abnormal program termination!"
+    fi
+       
+    /var/tmp/ktresume.sh
+else
+    export QWS_MOUSE_PROTO=none
+    export QWS_KEYBOARD=KindleKeyboard
+    export QWS_DISPLAY=KindleFb
+
+    killall -stop cvm
+    
+    sleep 1 # for launchpad to avoid bottom status bar
+    
+    cd $PYTHONPATH
+    python2.7 $@ > $LOG 2>&1
+    #$ROOT/app/okular-qte -qws -stylesheet $STYLESHEET > $LOG 2>&1
+
+    sleep 1
+
+    killall -cont cvm || /etc/init.d/framework start
+
+    if [ $model == K3 -o $model == K4  ]; then
+        echo send 102  > /proc/keypad
+    else
+        echo send 98   > /proc/keypad
+    fi
+fi
+
+# restore screensaver
+lipc-set-prop com.lab126.powerd preventScreenSaver 0
+
+rm $VLASOVSOFT_FIFO1
+rm $VLASOVSOFT_FIFO2
+

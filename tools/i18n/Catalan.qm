@@ -1,0 +1,20 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : FreeWare ANSI-C Compiler
+                              3 ; Version 2.4.0 Mon May 11 23:23:33 2009
+                              4 
+                              5 ;--------------------------------------------------------
+                              6 	.module mandaLCD
+                              7 	.optsdcc -mmcs51 --model-small
+                              8 	
+                              9 ;--------------------------------------------------------
+                             10 ; Public variables in this module
+                             11 ;--------------------------------------------------------
+                             12 	.globl _main
+                             13 	.globl _oracion
+                             14 	.globl _InicializarDisplay
+                             15 	.globl _datasend
+                             16 	.globl _controlsend
+                             17 ;--------------------------------------------------------
+                             18 ; special function registers
+                             19 ;--------------------------------------------------------
+  

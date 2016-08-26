@@ -1,0 +1,5 @@
+{
+	"items": [
+		{"name": "PyQt APPs", "priority": 1, "action": "/mnt/us/extensions/python/runit.sh"}       
+		]
+}

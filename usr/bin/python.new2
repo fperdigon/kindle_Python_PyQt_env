@@ -1,0 +1,5 @@
+#!/bin/sh
+export PYTHONPATH=/mnt/us/extensions/python/usr/lib/python2.7/
+
+export LD_LIBRARY_PATH=/mnt/us/extensions/python/usr/lib:/mnt/us/extensions/python/usr/lib/arm-linux-gnueabi:/mnt/us/extensions/python/lib/arm-linux-gnueabi:$LD_LIBRARY_PATH
+python2.7 $@

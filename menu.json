@@ -11,12 +11,14 @@
 		"items": [
 		{
 			"name": "KindleClock",
-			"action": "./runit_KindleClock.sh",
-			"priority": 1
+			"priority": 1,
+			"action": "./runit_KindleClock.sh"
 		},
 		{
-			"name": "Future",
+			"name": "Z_Future",
+			"priority": 2,
 			"action": "./runit_tst.sh"
+		}
 		]
 	}
 	]

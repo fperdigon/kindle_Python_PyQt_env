@@ -1,5 +1,5 @@
 #!/bin/sh
-export PYTHONPATH=/mnt/us/extensions/python/usr/lib/python2.7/
+export PYTHONPATH=/mnt/us/extensions/kindle_Python_PyQt_env/usr/lib/python2.7/
 
-export LD_LIBRARY_PATH=/mnt/us/extensions/python/usr/lib:/mnt/us/extensions/python/usr/lib/arm-linux-gnueabi:/mnt/us/extensions/python/lib/arm-linux-gnueabi:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/mnt/us/extensions/kindle_Python_PyQt_env/usr/lib:/mnt/us/extensions/kindle_Python_PyQt_env/usr/lib/arm-linux-gnueabi:/mnt/us/extensions/kindle_Python_PyQt_env/lib/arm-linux-gnueabi:$LD_LIBRARY_PATH
 python2.7 $@

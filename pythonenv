@@ -1,2 +1,2 @@
 #!/bin/sh
-export PATH=/mnt/us/extensions/python/usr/bin/:$PATH
+export PATH=/mnt/us/extensions/kindle_Python_PyQt_env/usr/bin/:$PATH

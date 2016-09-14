@@ -4,7 +4,7 @@
 		<name>PyQt APPs</name>
 		<version>1.0</version>
 		<author>bosito7</author>
-		<id>PyQt APPsc</id>
+		<id>PyQt APPs</id>
 	</information>
 	<menus>
 		<menu type="json" dynamic="true">menu.json</menu>

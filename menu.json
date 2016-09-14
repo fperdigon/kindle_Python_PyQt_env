@@ -1,5 +1,23 @@
 {
+	"comment001": "PyQt APPs Menu",
+	"comment002": "",
+	"comment003": "This is the configurations for Kual Launcher",
+	"comment004": "",
+	"comment005": "autor: bosito7",
 	"items": [
-		{"name": "PyQt APPs", "priority": 1, "action": "/mnt/us/extensions/python/runit.sh"}       
+	{
+		"name": "PyQt APPs",
+		"priority": 1,
+		"items": [
+		{
+			"name": "KindleClock",
+			"action": "./runit_KindleClock.sh",
+			"priority": 1
+		},
+		{
+			"name": "Future",
+			"action": "./runit_tst.sh"
 		]
+	}
+	]
 }
